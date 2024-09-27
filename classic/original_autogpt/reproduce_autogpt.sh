@@ -19,3 +19,7 @@ echo "Task prompt: $task_prompt"
 
 # . autogpt.sh run --ai-task "$task_prompt" --ai-name $cap_subdir --skip-reprompt --continuous --log-level DEBUG --vlm "gpt-4o-2024-05-13" --fast_llm "gpt-4o-2024-05-13" --smart_llm "gpt-4o-2024-05-13" --openai_cost_budget 4
 . autogpt.sh run --ai-task "$task_prompt" --paper-id "$index" --skip-reprompt --continuous --log-level DEBUG
+
+cat data/agents/$index/workspace/reproducibility_score.json | echo
+
+rm -r data/agents/$index/

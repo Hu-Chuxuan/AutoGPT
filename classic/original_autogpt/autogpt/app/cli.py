@@ -27,6 +27,11 @@ def cli(ctx: click.Context):
     type=int,
     help="Defines the number of times to run in continuous mode",
 )
+@click.option(
+    "--ai-task",
+    type=str,
+    help="Task of the agent to run; if not specified, the user will be prompted to choose one.",
+)
 @click.option("--speak", is_flag=True, help="Enable Speak Mode")
 @click.option(
     "--install-plugin-deps",
@@ -48,6 +53,11 @@ def cli(ctx: click.Context):
     "--ai-name",
     type=str,
     help="AI name override",
+)
+@click.option(
+    "--paper-id",
+    type=str,
+    help="For building workspaces",
 )
 @click.option(
     "--ai-role",
@@ -124,6 +134,8 @@ def run(
     skip_reprompt: bool,
     ai_name: Optional[str],
     ai_role: Optional[str],
+    ai_task: Optional[str],
+    paper_id: Optional[str],
     resource: tuple[str],
     constraint: tuple[str],
     best_practice: tuple[str],
@@ -159,6 +171,8 @@ def run(
         best_practices=list(best_practice),
         override_directives=override_directives,
         component_config_file=component_config_file,
+        ai_task=ai_task,
+        workspace=paper_id,
     )
 
 

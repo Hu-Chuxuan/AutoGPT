@@ -9,6 +9,7 @@ import os
 import re
 import signal
 import sys
+import subprocess
 from pathlib import Path
 from types import FrameType
 from typing import TYPE_CHECKING, Optional
@@ -75,6 +76,8 @@ async def run_auto_gpt(
     best_practices: Optional[list[str]] = None,
     override_directives: bool = False,
     component_config_file: Optional[Path] = None,
+    ai_task: Optional[str] = None,
+    workspace: Optional[str] = None,
 ):
     # Set up configuration
     config = ConfigBuilder.build_config_from_env()
@@ -245,12 +248,15 @@ async def run_auto_gpt(
     # Set up a new Agent #
     ######################
     if not agent:
-        task = ""
-        while task.strip() == "":
-            task = clean_input(
-                "Enter the task that you want AutoGPT to execute,"
-                " with as much detail as possible:",
-            )
+        if ai_task is None:
+            task = ""
+            while task.strip() == "":
+                task = clean_input(
+                    "Enter the task that you want AutoGPT to execute,"
+                    " with as much detail as possible:",
+                )
+        else:
+            task = ai_task.strip()
 
         ai_profile = AIProfile()
         additional_ai_directives = AIDirectives()
@@ -287,8 +293,12 @@ async def run_auto_gpt(
         else:
             logger.info("AI config overrides specified through CLI; skipping revision")
 
+        if workspace is None:
+            workspace = agent_manager.generate_id(ai_profile.ai_name)
+
         agent = create_agent(
-            agent_id=agent_manager.generate_id(ai_profile.ai_name),
+            # agent_id=agent_manager.generate_id(ai_profile.ai_name),
+            agent_id=workspace,
             task=task,
             ai_profile=ai_profile,
             directives=additional_ai_directives,
@@ -306,7 +316,8 @@ async def run_auto_gpt(
                 f"inside its workspace at:{Fore.RESET} {file_manager.workspace.root}",
                 extra={"preserve_color": True},
             )
-
+        subprocess.call(f"cp -r ../../../reproducibility-bench02/{workspace}/replication-package {file_manager.workspace.root}/", shell=True)
+        subprocess.call(f"cp -r ../../../reproducibility-bench02/{workspace}/paper.pdf {file_manager.workspace.root}/", shell=True)
         # TODO: re-evaluate performance benefit of task-oriented profiles
         # # Concurrently generate a custom profile for the agent and apply it once done
         # def update_agent_directives(

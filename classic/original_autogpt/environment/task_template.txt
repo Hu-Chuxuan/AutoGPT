@@ -1,0 +1,10 @@
+Your goal is to evaluate the reproducibility of a social science paper. You are already at a folder containing both the paper PDF and the replication package.
+Specifically, 
+1. you should rate the reproducibility of the paper at a scale of from 1 to 4, where 
+    1: major findings in the paper are irreproducible,
+    2: there are minor inconsistencies and/or errors in the provided data and/or code,
+    3: there are rounding errors or equivalent issues in the major findings,
+    4: major findings of the paper are fully reproducible.
+  Save your answer to a file named reproducibility_score.json in the directory you started in, which contains a single item with key being "reproducibility_score" and value being the score in integer.
+2. you should decide the score according to the reproduction results of the main findings of the paper, which include these figures: {figures}, tables: {tables}, and text claims: {claims}.
+3. the necessary text contents to reproduce the paper have been extracted for you: {paper_text}. you can also choose to extract the texts yourself from the provided PDF.

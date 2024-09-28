@@ -22,8 +22,10 @@ modify `classic/original_autogpt/.env.template` to include API key and ORG ID
 **Run the code**
 ```
 cd classic/original_autogpt
-./reproduce_autogpt.sh 94 False # General AutoGPT; this script sets up the remaining environment
-./reproduce_autogpt_core.sh 94 False # CoreAutoGPT
+./reproduce_autogpt.sh 94 # General AutoGPT; this script sets up the remaining environment
+./reproduce_autogpt_core.sh 94 # CoreAutoGPT
+./run_autogpt.sh # preliminary tests for general autogpt
+./run_autogpt_core.sh # preliminary tests for core autogpt
 ```
 the first parameter is the paper index, the second parameter is whether we want to pass only necessary texts to the agent.
 

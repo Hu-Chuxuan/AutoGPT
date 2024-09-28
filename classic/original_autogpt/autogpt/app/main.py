@@ -10,6 +10,7 @@ import re
 import signal
 import sys
 import subprocess
+import json
 from pathlib import Path
 from types import FrameType
 from typing import TYPE_CHECKING, Optional
@@ -56,6 +57,17 @@ from .utils import (
     print_python_version_info,
 )
 
+COST_DICT = {
+                "text-embedding-3-small": {"prompt_tokens": 0.02/1e6, "completion_tokens": 0},
+                "text-embedding-3-large": {"prompt_tokens": 0.13/1e6, "completion_tokens": 0},
+                "gpt-4o-2024-05-13": {"prompt_tokens": 5/1e6, "completion_tokens": 15/1e6},
+                "gpt-3.5-turbo-0125": {"prompt_tokens": 0.5/1e6, "completion_tokens": 1.5/1e6},
+                "gpt-3.5-turbo": {"prompt_tokens": 0.5/1e6, "completion_tokens": 1.5/1e6},
+                "gpt-4-turbo-2024-04-09": {"prompt_tokens": 10/1e6, "completion_tokens": 30/1e6},
+                "gpt-4-turbo": {"prompt_tokens": 10/1e6, "completion_tokens": 30/1e6},
+                "gpt-4o-mini-2024-07-18": {"prompt_tokens": 0.15/1e6, "completion_tokens": 1/1e6},
+                "gpt-4o-mini": {"prompt_tokens": 0.15/1e6, "completion_tokens": 1/1e6},
+            }
 
 @coroutine
 async def run_auto_gpt(
@@ -316,8 +328,8 @@ async def run_auto_gpt(
                 f"inside its workspace at:{Fore.RESET} {file_manager.workspace.root}",
                 extra={"preserve_color": True},
             )
-        subprocess.call(f"cp -r ../../../reproducibility-bench02/{workspace}/replication-package {file_manager.workspace.root}/", shell=True)
-        subprocess.call(f"cp -r ../../../reproducibility-bench02/{workspace}/paper.pdf {file_manager.workspace.root}/", shell=True)
+        subprocess.run(f"cp -r ../../../reproducibility-bench02/{workspace}/replication_package {file_manager.workspace.root}/", shell=True, check=True)
+        subprocess.run(f"cp ../../../reproducibility-bench02/{workspace}/paper.pdf {file_manager.workspace.root}/", shell=True, check=True)
         # TODO: re-evaluate performance benefit of task-oriented profiles
         # # Concurrently generate a custom profile for the agent and apply it once done
         # def update_agent_directives(
@@ -346,7 +358,8 @@ async def run_auto_gpt(
     # Run the Agent #
     #################
     try:
-        await run_interaction_loop(agent)
+        cost_log = f"./environment/{workspace}/cost.json"
+        await run_interaction_loop(agent, cost_log_path=cost_log)
     except AgentTerminated:
         agent_id = agent.state.agent_id
         logger.info(f"Saving state of {agent_id}...")
@@ -361,6 +374,17 @@ async def run_auto_gpt(
             save_as_id.strip() if not save_as_id.isspace() else None
         )
 
+    task_total_cost = agent.llm_provider.get_incurred_cost()
+    if task_total_cost > 0:
+        logger.info(
+            f"Total LLM cost for task {workspace}: "
+            f"${round(task_total_cost, 2)}"
+        )
+    budget = float(os.environ.get("OPENAI_COST_BUDGET"))
+    if task_total_cost > budget:
+        logger.info(
+            f"Task {workspace} exceeds budget limit!"
+        )
 
 @coroutine
 async def run_auto_gpt_server(
@@ -451,6 +475,7 @@ class UserFeedback(str, enum.Enum):
 
 async def run_interaction_loop(
     agent: "Agent",
+    cost_log_path: str,
 ) -> None:
     """Run the main interaction loop for the agent.
 
@@ -509,6 +534,8 @@ async def run_interaction_loop(
 
     # Keep track of consecutive failures of the agent
     consecutive_failures = 0
+
+    costs = []
 
     while cycles_remaining > 0:
         logger.debug(f"Cycle budget: {cycle_budget}; remaining: {cycles_remaining}")
@@ -625,6 +652,18 @@ async def run_interaction_loop(
                 f"Command {action_proposal.use_tool.name} returned an error: "
                 f"{result.error or result.reason}"
             )
+        task_total_cost = agent.llm_provider.get_incurred_cost()
+        if task_total_cost > 0:
+            logger.info(
+                f"Total LLM cost for task: "
+                f"${round(task_total_cost, 2)}"
+            )
+            costs.append(task_total_cost)
+            with open(cost_log_path, 'w') as file:
+                json.dump(costs, file)
+        budget = float(os.environ.get("OPENAI_COST_BUDGET"))
+        if task_total_cost > budget:
+            break
 
 
 def update_user(

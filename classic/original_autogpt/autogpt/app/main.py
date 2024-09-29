@@ -536,10 +536,10 @@ async def run_interaction_loop(
     consecutive_failures = 0
 
     costs = []
+    commands = 0
 
     while cycles_remaining > 0:
         logger.debug(f"Cycle budget: {cycle_budget}; remaining: {cycles_remaining}")
-
         ########
         # Plan #
         ########

@@ -1,7 +1,10 @@
 #!/bin/bash
 
-# Loop from 10 to 100 in steps of 10
-for index in $(seq 10 10 100)   # This will generate 10, 20, 30, ..., 100
+# Define the list of numbers
+numbers=(1 10 23 32 53 54 65 80 81 100)
+
+# Loop over each number in the list
+for index in "${numbers[@]}"  # Iterate over the array
 do
     # Run the reproduce_autogpt.sh script with the current index
     ./reproduce_autogpt_core.sh $index

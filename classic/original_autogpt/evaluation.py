@@ -5,17 +5,17 @@ import csv
 
 def evaluate(index):
     directory = f"./environment/{index}"
-    reproduce_score_path = directory + "/reproduce_score.json"
+    reproduce_score_path = directory + "/reproducibility_score.json"
     if os.path.exists(reproduce_score_path):
         # Open the file if it exists
         with open(reproduce_score_path, 'r') as file:
-            data = json.load(file)  # Assuming it's a JSON file
+            data1 = json.load(file)  # Assuming it's a JSON file
         ground_truth_path = f"../../../ground_truth.json"
         with open(ground_truth_path, 'r') as file:
             data = json.load(file)  
-        ground_truth = data[index]
+        ground_truth = data[str(index)]
         try:
-            result = (int(data["reproducibility_score"])==int(ground_truth))
+            result = 1 if int(data1["reproducibility_score"]) == int(ground_truth) else 0
         except:
             result = 0
     else:

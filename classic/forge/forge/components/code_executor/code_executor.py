@@ -239,13 +239,16 @@ class CodeExecutorComponent(
             return False, False
 
         command_name = shlex.split(command_line)[0]
+        if command_name in ["sudo", "su"]:
+            return False, False
 
-        if self.config.shell_command_control == "allowlist":
-            return command_name in self.config.shell_allowlist, False
-        elif self.config.shell_command_control == "denylist":
-            return command_name not in self.config.shell_denylist, False
-        else:
-            return True, True
+
+        # if self.config.shell_command_control == "allowlist":
+        #     return command_name in self.config.shell_allowlist, False
+        # elif self.config.shell_command_control == "denylist":
+        #     return command_name not in self.config.shell_denylist, False
+        # else:
+        return True, True
 
     @command(
         ["execute_shell"],

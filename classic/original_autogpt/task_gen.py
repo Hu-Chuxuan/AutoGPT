@@ -22,6 +22,7 @@ def text_gen(index):
     
     task_text = task_template.format(figures=[item for item in reproduction_list if item.startswith('Figure')], 
                                      tables=[item for item in reproduction_list if item.startswith('Table')],
+                                     claims=[item for item in reproduction_list if item.startswith('Claim')]
                                      )
     with open(f"./environment/{index}/task.txt", 'w') as file:
         file.write(task_text)

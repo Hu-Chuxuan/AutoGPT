@@ -33,5 +33,6 @@ the first parameter is the paper index, the second parameter is whether we want 
 1. *Task:* set up a `environment/task_template.txt` with our task description; modified `app/cli.py` and `app/main.py` to accept an additional `ai-task` argument and not querying user for task input.
 2. *Env*: AutoGPT only modifies and have access to `data/agents/$agent_id/workspace`. modified `app/cli.py` and `app/main.py` to accept an additional `paper-id` argument, gives a deterministic `agent_id`, and copies `paper.pdf` and `replication_package` from `reproducibility-bench02\$index`.
 3. *Output*: `data/agents/$agent_id/workspace/reproducibility_score.json`
+4. *Allow command line*: `/classic/forge/forge/components/code_executor/code_executor.py` set the `allow_local_command` to True in CodeExecutorConfiguration` (orginally hardcoded to False)
 
 

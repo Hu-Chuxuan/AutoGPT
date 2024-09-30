@@ -54,7 +54,7 @@ class CodeExecutionError(CommandExecutionError):
 
 
 class CodeExecutorConfiguration(BaseModel):
-    execute_local_commands: bool = False
+    execute_local_commands: bool = True
     """Enable shell command execution"""
     shell_command_control: Literal["allowlist", "denylist"] = "allowlist"
     """Controls which list is used"""

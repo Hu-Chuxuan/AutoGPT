@@ -7,5 +7,4 @@ Specifically,
     4: major findings of the paper are fully reproducible.
   Save your answer to a file named reproducibility_score.json in the directory you started in, which contains a single item with key being "reproducibility_score" and value being the score in integer.
 2. you should decide the score according to the reproduction results of the main findings of the paper, which include these figures: {figures}, tables: {tables}, and text claims: {claims}.
-IMPORTANT RULE: You have to first generate a score within 10 commands, i.e., you should keep track of how many commands you have executed. You can always update that score until whenever you want.
 The stata version is SE, i.e., the right STATA command is `stata-se`.

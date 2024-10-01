@@ -8,14 +8,17 @@ def evaluate(index):
     reproduce_score_path = directory + "/reproducibility_score.json"
     if os.path.exists(reproduce_score_path):
         # Open the file if it exists
-        with open(reproduce_score_path, 'r') as file:
-            data1 = json.load(file)  # Assuming it's a JSON file
-        ground_truth_path = f"../../../ground_truth.json"
-        with open(ground_truth_path, 'r') as file:
-            data = json.load(file)  
-        ground_truth = data[str(index)]
         try:
-            result = 1 if int(data1["reproducibility_score"]) == int(ground_truth) else 0
+            with open(reproduce_score_path, 'r') as file:
+                data1 = json.load(file)  # Assuming it's a JSON file
+            ground_truth_path = f"../../../ground_truth.json"
+            with open(ground_truth_path, 'r') as file:
+                data = json.load(file)  
+            ground_truth = data[str(index)]
+            try:
+                result = 1 if int(data1["reproducibility_score"]) == int(ground_truth) else 0
+            except:
+                result = 0
         except:
             result = 0
     else:
@@ -23,9 +26,12 @@ def evaluate(index):
 
     cost_path = directory + "/cost.json"
     if os.path.exists(cost_path):
-        with open(cost_path, 'r') as file:
-            cost_data = json.load(file)
-        cost = cost_data[-1] if cost_data else 0
+        try:
+            with open(cost_path, 'r') as file:
+                cost_data = json.load(file)
+            cost = cost_data[-1] if cost_data else 0
+        except:
+            cost = 0
     else:
         cost = 0  # Default cost if cost.json doesn't exist
 

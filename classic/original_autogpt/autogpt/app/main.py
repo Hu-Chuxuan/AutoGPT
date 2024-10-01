@@ -328,7 +328,7 @@ async def run_auto_gpt(
                 f"inside its workspace at:{Fore.RESET} {file_manager.workspace.root}",
                 extra={"preserve_color": True},
             )
-        subprocess.run(f"cp -r ../../../reproducibility-bench02/{workspace}/replication_package {file_manager.workspace.root}/", shell=True, check=True)
+        subprocess.run(f"cp -rf ../../../reproducibility-bench02/{workspace}/replication_package {file_manager.workspace.root}/", shell=True, check=True)
         subprocess.run(f"cp ../../../reproducibility-bench02/{workspace}/paper.pdf {file_manager.workspace.root}/", shell=True, check=True)
         # TODO: re-evaluate performance benefit of task-oriented profiles
         # # Concurrently generate a custom profile for the agent and apply it once done
@@ -380,6 +380,11 @@ async def run_auto_gpt(
             f"Total LLM cost for task {workspace}: "
             f"${round(task_total_cost, 2)}"
         )
+        with open(cost_log, 'r') as file:
+            costs = json.load(file)
+        costs.append(task_total_cost)
+        with open(cost_log, 'w') as file:
+            json.dump(costs, file)
     budget = float(os.environ.get("OPENAI_COST_BUDGET"))
     if task_total_cost > budget:
         logger.info(
@@ -641,6 +646,7 @@ async def run_interaction_loop(
         handle_stop_signal()
 
         if not feedback:
+            # print("*********DEBUG: ", action_proposal)
             result = await agent.execute(action_proposal)
         else:
             result = await agent.do_not_execute(action_proposal, feedback)
